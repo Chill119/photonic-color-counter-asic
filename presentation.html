@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photonic Color-Counter ASIC — Project Summary</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --accent: #ffd700;
+    --accent2: #00bfff;
+    --text: #e0e0e0;
+    --muted: #888;
+    --pass: #2ecc71;
+    --fail: #e74c3c;
+    --warn: #f39c12;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* Slide container */
+  .slide {
+    min-height: 100vh; padding: 3rem 4rem;
+    display: flex; flex-direction: column; justify-content: center;
+    border-bottom: 2px solid #333;
+    page-break-after: always;
+  }
+  .slide h1 { color: var(--accent); font-size: 2.4rem; margin-bottom: 0.5rem; }
+  .slide h2 { color: var(--accent2); font-size: 1.6rem; margin: 1.2rem 0 0.6rem; }
+  .slide h3 { color: var(--accent); font-size: 1.2rem; margin: 1rem 0 0.4rem; }
+  .slide p, .slide li { font-size: 1.05rem; line-height: 1.6; }
+  .slide ul { margin-left: 1.5rem; }
+  .slide li { margin-bottom: 0.3rem; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+  .tag { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-right: 0.4rem; }
+  .tag-pass { background: var(--pass); color: #000; }
+  .tag-fail { background: var(--fail); color: #fff; }
+  .tag-info { background: var(--accent2); color: #000; }
+
+  /* Tables */
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.95rem; }
+  th { background: #2a2a3e; color: var(--accent); text-align: left; padding: 0.6rem 0.8rem; }
+  td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #333; }
+  tr:hover td { background: #222235; }
+  .pass { color: var(--pass); font-weight: 600; }
+  .fail { color: var(--fail); font-weight: 600; }
+
+  /* Grid layouts */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; border: 1px solid #333; }
+  .card h3 { margin-top: 0; }
+  .stat { font-size: 2.2rem; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 0.85rem; color: var(--muted); }
+
+  /* Diagram */
+  .diagram { background: #111122; border-radius: 8px; padding: 1.5rem; margin: 1rem 0;
+             font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.5;
+             white-space: pre; overflow-x: auto; color: var(--accent2); }
+
+  /* Images */
+  .img-row { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+  .img-row img { max-height: 280px; border-radius: 6px; border: 1px solid #444; }
+
+  /* Progress bar */
+  .progress-bar { height: 24px; background: #2a2a3e; border-radius: 12px; overflow: hidden; margin: 0.5rem 0; }
+  .progress-fill { height: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+                   font-size: 0.75rem; font-weight: 700; color: #000; }
+
+  /* Navigation */
+  .nav { position: fixed; bottom: 1rem; right: 1rem; display: flex; gap: 0.5rem; z-index: 100; }
+  .nav a { display: inline-block; padding: 0.4rem 0.8rem; background: var(--card); color: var(--accent);
+           border: 1px solid var(--accent); border-radius: 4px; text-decoration: none; font-size: 0.8rem; }
+  .nav a:hover { background: var(--accent); color: #000; }
+  .slide-num { position: absolute; top: 1rem; right: 2rem; color: var(--muted); font-size: 0.85rem; }
+
+  @media print {
+    .nav { display: none; }
+    .slide { min-height: auto; padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 1: TITLE -->
+<div class="slide" id="s1">
+  <span class="slide-num">1 / 12</span>
+  <h1>Photonic Waveguide Color-Counting ASIC</h1>
+  <p class="subtitle">Project Summary — Design Review Package</p>
+  <div class="grid2" style="margin-top:2rem;">
+    <div>
+      <p style="font-size:1.15rem; line-height:1.8;">
+        A hybrid electro-photonic ASIC that encodes <strong>8-bit binary counter state</strong>
+        as the presence or absence of distinct optical wavelength channels —
+        a <strong>spectral fingerprint</strong> that changes with every count.
+      </p>
+      <p style="margin-top:1rem;">
+        <span class="tag tag-info">GF 45SPCLO</span>
+        <span class="tag tag-info">300 mm</span>
+        <span class="tag tag-info">Monolithic CMOS + Photonics</span>
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <p style="color:var(--muted); margin-bottom:0.5rem;">Core Concept</p>
+      <div class="diagram" style="font-size:0.75rem; text-align:left;">Counter Value: 0b10110011 = 179
+
+λ₀ ████ present  (bit 0 = 1)
+λ₁ ████ present  (bit 1 = 1)
+λ₂ ░░░░ blocked  (bit 2 = 0)
+λ₃ ░░░░ blocked  (bit 3 = 0)
+λ₄ ████ present  (bit 4 = 1)
+λ₅ ████ present  (bit 5 = 1)
+λ₆ ░░░░ blocked  (bit 6 = 0)
+λ₇ ████ present  (bit 7 = 1)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 2: ARCHITECTURE -->
+<div class="slide" id="s2">
+  <span class="slide-num">2 / 12</span>
+  <h1>System Architecture</h1>
+  <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        MONOLITHIC ASIC DIE                              │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │  PHOTONIC INTEGRATED CIRCUIT                                      │  │
+│  │                                                                    │  │
+│  │  Comb ──► WDM ──► [MRR₀][MRR₁][MRR₂]...[MRR₇] ──► Output Bus  │  │
+│  │  Source   Demux   ◯     ◯     ◯         ◯       ──► Readout PDs │  │
+│  │                   │     │     │         │             │          │  │
+│  └───────────────────┼─────┼─────┼─────────┼─────────────┼──────────┘  │
+│  ┌───────────────────┼─────┼─────┼─────────┼─────────────┼──────────┐  │
+│  │  CMOS CONTROL     │     │     │         │             │          │  │
+│  │  ┌─────────┐   ┌──┴─────┴─────┴─────────┴──┐   ┌─────┴───────┐  │  │
+│  │  │ Counter │──►│   EO Driver + Heater DAC   │   │ TIA + Comp  │  │  │
+│  │  │  8-bit  │   │   + PID Locking FSM        │   │ + Readout   │  │  │
+│  │  └────┬────┘   └────────────────────────────┘   └─────────────┘  │  │
+│  │       │ CLK                                                       │  │
+│  └───────┼───────────────────────────────────────────────────────────┘  │
+│          │                                                              │
+└──────────┼──────────────────────────────────────────────────────────────┘
+           │
+     External Clock</div>
+  <p style="margin-top:1rem; color:var(--muted);">
+    CMOS handles counting + control. Photonics handles wavelength-parallel state encoding + readout.
+    Staged architecture: optical counting logic deferred until MRR memory matures.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 3: KEY SPECS -->
+<div class="slide" id="s3">
+  <span class="slide-num">3 / 12</span>
+  <h1>Key Performance Specifications</h1>
+  <div class="grid3">
+    <div class="card" style="text-align:center;">
+      <div class="stat">8</div>
+      <div class="stat-label">Counter Width (bits)<br/>Scalable to 32+</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">10 GHz</div>
+      <div class="stat-label">Guaranteed Clock Rate<br/>(35 GHz typical)</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">357 ps</div>
+      <div class="stat-label">End-to-End Latency<br/>(clock → readout)</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">43 dB</div>
+      <div class="stat-label">MRR Switching<br/>Extinction Ratio</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">&lt; 350 mW</div>
+      <div class="stat-label">Total Power<br/>(incl. 8-ch heaters)</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">10⁻¹²</div>
+      <div class="stat-label">Readout BER<br/>(at nominal)</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">5.69 nm</div>
+      <div class="stat-label">MRR Free Spectral<br/>Range</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">4.3 mW/π</div>
+      <div class="stat-label">Heater Efficiency<br/>(with undercut)</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat">2 mm²</div>
+      <div class="stat-label">Photonic Core<br/>Die Area</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 4: FABRICATION -->
+<div class="slide" id="s4">
+  <span class="slide-num">4 / 12</span>
+  <h1>Manufacturing Process — 22 Steps</h1>
+  <div class="grid2">
+    <div>
+      <h2>Wafer Fabrication (Steps 1–14)</h2>
+      <table>
+        <tr><td>1</td><td>SOI wafer (Si + 2µm BOX + 220nm Si)</td></tr>
+        <tr><td>2–3</td><td>Waveguide full & partial etch</td></tr>
+        <tr><td>4</td><td>PN junction implant (Z-shape profile)</td></tr>
+        <tr><td>5</td><td>Ge epitaxy for photodetectors</td></tr>
+        <tr><td>6</td><td>SiN deposition & patterning</td></tr>
+        <tr><td>7</td><td>SiO₂ cladding planarization</td></tr>
+        <tr><td>8–9</td><td>Contact vias + TiN heater layer</td></tr>
+        <tr><td>10–11</td><td>BEOL metal stack (M1–M9) + CMOS FETs</td></tr>
+        <tr><td>12</td><td>Thermal undercut (5× efficiency gain)</td></tr>
+        <tr><td>13</td><td>Sb₂Se₃ phase-change patches</td></tr>
+        <tr><td>14</td><td>Passivation + pad opening</td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>System Assembly (Steps 15–22)</h2>
+      <table>
+        <tr><td>15</td><td>Wafer sort & dice</td></tr>
+        <tr><td>16–18</td><td>PIC region: bus WG + MRR bank + PD array</td></tr>
+        <tr><td>19</td><td>CMOS blocks: counter, PID, DAC, TIA</td></tr>
+        <tr><td>20</td><td>Flip-chip SiN comb source bonding</td></tr>
+        <tr><td>21</td><td>Fiber array attach (edge-coupled)</td></tr>
+        <tr><td>22</td><td>Hermetic package + wire bond</td></tr>
+      </table>
+      <p style="margin-top:1rem; color:var(--muted); font-size:0.9rem;">
+        See <code>manufacturing_process.gif</code> for animated cross-section buildup.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 5: INTERFACES -->
+<div class="slide" id="s5">
+  <span class="slide-num">5 / 12</span>
+  <h1>Photonic-CMOS Interface Map</h1>
+  <p class="subtitle">6 named interfaces, fully specified with min/typ/max parametric tables</p>
+  <div class="grid3">
+    <div class="card">
+      <h3>IF-HTR</h3>
+      <p><strong>Heater Drive</strong> (CMOS → PIC)</p>
+      <p>10-bit DAC, 8 channels<br/>4.3 mW/π, 8 µs settling<br/>100 kHz PID locking loop</p>
+    </div>
+    <div class="card">
+      <h3>IF-EO</h3>
+      <p><strong>Electro-Optic Mod</strong> (CMOS → PIC)</p>
+      <p>PN depletion, 30 pm/V<br/>6 fJ/bit, 35 GHz typical BW<br/>&lt; 100 ps driver latency</p>
+    </div>
+    <div class="card">
+      <h3>IF-RDPD</h3>
+      <p><strong>Readout PD</strong> (PIC → CMOS)</p>
+      <p>8× Ge PDs, 0.8 A/W<br/>21 µA signal, Q = 6.97<br/>BER = 1.6 × 10⁻¹²</p>
+    </div>
+    <div class="card">
+      <h3>IF-TAP</h3>
+      <p><strong>Tap Monitor</strong> (PIC → CMOS)</p>
+      <p>ΔΣ ADC, 60 dB SNR<br/>Digital PID controller<br/>±0.5 pm locking precision</p>
+    </div>
+    <div class="card">
+      <h3>IF-PCM</h3>
+      <p><strong>Phase-Change Trim</strong> (CMOS → PIC)</p>
+      <p>Sb₂Se₃ via PN junction<br/>Non-volatile, full FSR<br/>10⁴ cycle endurance</p>
+    </div>
+    <div class="card">
+      <h3>IF-TEMP</h3>
+      <p><strong>Temperature Sensor</strong> (PIC → CMOS)</p>
+      <p>Si diode, ±1°C accuracy<br/>2 sensors on die<br/>−40°C to +105°C range</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 6: SIM RESULTS -->
+<div class="slide" id="s6">
+  <span class="slide-num">6 / 12</span>
+  <h1>Simulation Results</h1>
+  <div class="grid2">
+    <div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:75%; background: linear-gradient(90deg, var(--pass), var(--pass));">
+          15 / 20 PASSED
+        </div>
+      </div>
+      <table>
+        <tr><th>ID</th><th>Check</th><th>Result</th><th>Status</th></tr>
+        <tr><td>T-01</td><td>EO path total delay</td><td>357 ps</td><td class="pass">✓</td></tr>
+        <tr><td>SI-01</td><td>Reflection at driver</td><td>~0%</td><td class="pass">✓</td></tr>
+        <tr><td>MRR-01</td><td>Switching extinction</td><td>43.4 dB</td><td class="pass">✓</td></tr>
+        <tr><td>MRR-02</td><td>Channel isolation</td><td>14.4 dB</td><td class="fail">✗</td></tr>
+        <tr><td>MRR-03</td><td>Free spectral range</td><td>5.69 nm</td><td class="pass">✓</td></tr>
+        <tr><td>BER-01</td><td>Readout Q-factor</td><td>6.97</td><td class="pass">✓</td></tr>
+        <tr><td>BER-03</td><td>Link margin</td><td>0.6 dB</td><td class="fail">✗</td></tr>
+        <tr><td>TH-01</td><td>Heater settling</td><td>8.0 µs</td><td class="pass">✓</td></tr>
+        <tr><td>TH-03</td><td>PID steady-state</td><td>177 pm</td><td class="fail">✗</td></tr>
+        <tr><td>BW-01</td><td>EO BW (worst corner)</td><td>10 GHz</td><td class="fail">✗</td></tr>
+        <tr><td>ENC-01</td><td>256-state encoding</td><td>0 errors</td><td class="pass">✓</td></tr>
+      </table>
+    </div>
+    <div>
+      <h2>7 Diagnostic Plots Generated</h2>
+      <ul>
+        <li>EO timing waterfall + clock margin chart</li>
+        <li>Signal integrity waveforms (driver → load → reflection)</li>
+        <li>MRR Lorentzian switching spectra</li>
+        <li>BER vs. photocurrent + voltage distributions</li>
+        <li>Thermal step response + PID locking transient</li>
+        <li>8-channel spectral barcodes (8 of 256 states)</li>
+        <li>EO bandwidth across 12 PVT corners</li>
+      </ul>
+      <p style="margin-top:1rem; color: var(--muted);">
+        All plots in <code>sim_output/</code>. Script reruns in ~5 seconds.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 7: FINDINGS -->
+<div class="slide" id="s7">
+  <span class="slide-num">7 / 12</span>
+  <h1>Five Findings — All Resolvable</h1>
+  <table>
+    <tr><th>Finding</th><th>Root Cause</th><th>Corrective Action</th><th>Impact</th></tr>
+    <tr>
+      <td><span class="tag tag-fail">F-1</span> Channel isolation<br/>14.4 dB &lt; 25 dB</td>
+      <td>Lorentzian tails at Q=5000,<br/>0.8 nm spacing too tight</td>
+      <td><strong>Widen to 200 GHz spacing</strong><br/>→ 28 dB isolation, same MRR</td>
+      <td>4 ch per FSR → need 2 ring groups</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-fail">F-2</span> Link margin<br/>0.6 dB &lt; 3 dB</td>
+      <td>Comb −10 dBm/line +<br/>5.7 dB path loss</td>
+      <td><strong>MRR-based demux</strong> (save 2 dB)<br/>+ <strong>matched TIA BW</strong> (save 1 dB)</td>
+      <td>Recovers 3 dB, no new components</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-fail">F-3</span> PID settling<br/>15 ms &gt; 500 µs</td>
+      <td>100 kHz loop vs. 3.6 µs<br/>thermal plant τ</td>
+      <td><strong>Increase loop to 1 MHz</strong><br/>+ feed-forward temp compensation</td>
+      <td>Settles in ~50 µs at 1 MHz</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-fail">F-4</span> Worst-corner BW<br/>10 GHz &lt; 20 GHz</td>
+      <td>Rs=400Ω, Cj=40fF at<br/>slow process corner</td>
+      <td><strong>Speed-bin at wafer sort</strong><br/>5 GHz guaranteed / 10 GHz typical</td>
+      <td>No design change; test-time decision</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-fail">F-5</span> Visible channel<br/>separation ~0.09 nm</td>
+      <td>THG of adjacent 0.8 nm<br/>C-band lines</td>
+      <td><strong>Defer visible to Phase 7</strong><br/>or use wider-FSR comb</td>
+      <td>IR-only demo fully functional</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 8: CONSTRAINTS -->
+<div class="slide" id="s8">
+  <span class="slide-num">8 / 12</span>
+  <h1>Design Constraint Flow</h1>
+  <div class="diagram" style="font-size:0.8rem;">
+  PHYSICS                    PROCESS                    DESIGN DECISION
+  ═══════                    ═══════                    ═══════════════
+  Si thermo-optic            MRR fab variation
+  0.08 nm/°C ──────────────► ±2 nm ──────────────────► Undercut heaters (4.3 mW/π)
+       │                                                + Sb₂Se₃ non-volatile trim
+       └──► ±1.6 nm drift                                    │
+                                                              ▼
+  Lorentzian                 SiN Q &lt; 10⁶               Flip-chip comb source
+  tail roll-off ───────────► in 45CLO ──────────────►  (dedicated high-Q SiN die)
+       │
+       └──► 14 dB isolation ──────────────────────────► 200 GHz channel spacing
+
+  Comb per-line              PN junction RC             Speed binning
+  −10 dBm ──────────────────► corner spread ──────────► 5/10 GHz grades
+       │                     (10–40 GHz BW)
+       └──► tight link budget ──────────────────────► Low-loss MRR demux
+                                                      + matched TIA BW
+  Thermal τ = 3.6 µs ──────────────────────────────► 1 MHz PID loop rate</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 9: TEST PLAN -->
+<div class="slide" id="s9">
+  <span class="slide-num">9 / 12</span>
+  <h1>Verification Test Plan — 60 Tests</h1>
+  <div class="grid2">
+    <div>
+      <h2>4-Level Hierarchy</h2>
+      <div class="card" style="margin-bottom:0.8rem;">
+        <h3>Level 1 — Component (39 tests)</h3>
+        <p>21 photonic (waveguide loss, MRR Q, PD responsivity, heater efficiency…)<br/>
+           18 CMOS (counter function, DAC linearity, TIA noise, PID step response…)</p>
+      </div>
+      <div class="card" style="margin-bottom:0.8rem;">
+        <h3>Level 2 — Subsystem (8 tests)</h3>
+        <p>Per-interface end-to-end: heater loop, EO switching eye,<br/>
+           readout chain, PID locking, 256-state encoding, crosstalk</p>
+      </div>
+      <div class="card" style="margin-bottom:0.8rem;">
+        <h3>Level 3 — System (10 tests)</h3>
+        <p>Free-running count, max clock rate, spectral verification,<br/>
+           optical readback BER, startup, latency, visible output</p>
+      </div>
+      <div class="card">
+        <h3>Level 4 — Environmental (11 tests)</h3>
+        <p>−10°C to +85°C sweep, thermal shock, ESD, latch-up,<br/>
+           PCM retention, heater endurance, humidity, vibration</p>
+      </div>
+    </div>
+    <div>
+      <h2>Key Pass Criteria</h2>
+      <table>
+        <tr><th>Requirement</th><th>Criterion</th></tr>
+        <tr><td>Counting correctness</td><td>0 errors over 10⁶ cycles</td></tr>
+        <tr><td>Readout fidelity</td><td>BER &lt; 10⁻⁹ over 10⁸ bits</td></tr>
+        <tr><td>Channel isolation</td><td>&gt; 25 dB adjacent</td></tr>
+        <tr><td>Locking stability</td><td>±2 pm across ±20°C</td></tr>
+        <tr><td>Startup time</td><td>&lt; 5 ms to lock</td></tr>
+        <tr><td>Total power</td><td>&lt; 350 mW</td></tr>
+        <tr><td>PCM retention</td><td>&lt; ±10 pm drift at 85°C/168h</td></tr>
+        <tr><td>ESD</td><td>HBM ±2 kV, CDM ±500 V</td></tr>
+      </table>
+      <p style="margin-top:1rem; color:var(--muted);">
+        Full traceability matrix maps every architecture requirement → interface spec → test ID.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 10: ROADMAP -->
+<div class="slide" id="s10">
+  <span class="slide-num">10 / 12</span>
+  <h1>Implementation Roadmap</h1>
+  <p class="subtitle">~30 months to first silicon</p>
+  <table>
+    <tr><th>Phase</th><th>Duration</th><th>Activities</th><th>Gate</th></tr>
+    <tr><td>0–1</td><td>6 months</td><td>Requirements freeze, foundry access, PDK setup</td><td>Architecture approved</td></tr>
+    <tr><td>2–3</td><td>12 months</td><td>Photonic + CMOS subsystem design</td><td>Schematic review</td></tr>
+    <tr><td>4</td><td>6 months</td><td>Co-simulation, layout, DRC/LVS</td><td>Tapeout signoff</td></tr>
+    <tr><td>5</td><td>6 months</td><td>Fabrication + packaging</td><td>First silicon received</td></tr>
+    <tr><td>6</td><td>6 months</td><td>Bring-up, validation, demo</td><td>All L3 tests pass</td></tr>
+    <tr><td>7</td><td>Ongoing</td><td>Scale to 32-bit, optical-logic experiments, visible demo</td><td>Research milestones</td></tr>
+  </table>
+  <div class="progress-bar" style="margin-top:1.5rem;">
+    <div class="progress-fill" style="width:8%; background: var(--accent);">Phase 0</div>
+  </div>
+  <p style="color:var(--muted); margin-top:0.3rem;">Current status: Pre-silicon design complete. Ready for design review.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 11: OPEN ITEMS -->
+<div class="slide" id="s11">
+  <span class="slide-num">11 / 12</span>
+  <h1>10 Open Items for Design Review</h1>
+  <table>
+    <tr><th>#</th><th>Item</th><th>Priority</th><th>Recommendation</th></tr>
+    <tr><td>1</td><td>Channel spacing: 100 vs 200 GHz</td><td class="fail">Critical</td><td>200 GHz (per F-1)</td></tr>
+    <tr><td>2</td><td>Comb source: flip-chip SiN vs multi-λ DFB</td><td class="fail">Critical</td><td>Flip-chip SiN</td></tr>
+    <tr><td>3</td><td>TIA noise target: 1.5 vs 2.0 µA_rms</td><td style="color:var(--warn)">High</td><td>1.5 µA (per F-2)</td></tr>
+    <tr><td>4</td><td>PID loop rate: 100 kHz vs 1 MHz</td><td style="color:var(--warn)">High</td><td>1 MHz (per F-3)</td></tr>
+    <tr><td>5</td><td>Speed grade: single vs binned</td><td>Medium</td><td>Binned 5/10 GHz</td></tr>
+    <tr><td>6</td><td>Sb₂Se₃ BEOL foundry compatibility</td><td style="color:var(--warn)">High</td><td>Foundry engagement needed</td></tr>
+    <tr><td>7</td><td>Visible conversion: include or defer</td><td>Low</td><td>Defer to Phase 7</td></tr>
+    <tr><td>8</td><td>Coupled-ring test structures?</td><td>Medium</td><td>Include alongside baseline</td></tr>
+    <tr><td>9</td><td>On-chip SOA: reserve die area?</td><td>Low</td><td>Reserve 200 × 50 µm</td></tr>
+    <tr><td>10</td><td>Package: hermetic vs non-hermetic</td><td>Medium</td><td>Hermetic preferred</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SLIDE 12: DELIVERABLES -->
+<div class="slide" id="s12">
+  <span class="slide-num">12 / 12</span>
+  <h1>Project Deliverables</h1>
+  <div class="grid2">
+    <div>
+      <table>
+        <tr><th>Document</th><th>File</th></tr>
+        <tr><td>Architecture (12 sections)</td><td><code>photonic-color-counter-architecture.md</code></td></tr>
+        <tr><td>Interface Spec (6 interfaces)</td><td><code>photonic-cmos-interface-spec.md</code></td></tr>
+        <tr><td>Test Plan (60 tests)</td><td><code>photonic-cmos-interface-spec.md</code> Part II</td></tr>
+        <tr><td>Simulation Script (20 checks)</td><td><code>sim_photonic_cmos_interface.py</code></td></tr>
+        <tr><td>Manufacturing Animation</td><td><code>sim_manufacturing_animation.py</code></td></tr>
+        <tr><td>Final Report</td><td><code>photonic-counter-final-report.md</code></td></tr>
+        <tr><td>This Presentation</td><td><code>presentation.html</code></td></tr>
+        <tr><td>Simulation Plots (7)</td><td><code>sim_output/*.png</code></td></tr>
+        <tr><td>Animation + Key Frames</td><td><code>sim_output/*.gif, *.png</code></td></tr>
+      </table>
+    </div>
+    <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center;">
+      <div class="stat" style="font-size:1.8rem;">Design Review Ready</div>
+      <p style="margin-top:1rem; font-size:1.1rem;">
+        15 / 20 simulation checks passing<br/>
+        5 findings with corrective actions<br/>
+        10 open items for decision<br/>
+        ~30 months to first silicon
+      </p>
+      <p style="margin-top:1.5rem; color: var(--accent); font-size:1.3rem; font-weight:700;">
+        Next step: Close open items → Phase 2
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <a href="#s1">1</a><a href="#s2">2</a><a href="#s3">3</a><a href="#s4">4</a>
+  <a href="#s5">5</a><a href="#s6">6</a><a href="#s7">7</a><a href="#s8">8</a>
+  <a href="#s9">9</a><a href="#s10">10</a><a href="#s11">11</a><a href="#s12">12</a>
+</div>
+
+</body>
+</html>
